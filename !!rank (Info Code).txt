@@ -1,0 +1,39 @@
+{{deleteTrigger 1}}
+{{$color := randInt 1 16777215}}
+{{$dbXP := "user_LVL"}}
+{{$userID := .User.ID}}
+{{$eachCallAmount := 10}}
+{{$place := 0}}
+{{$lastpt := -1}}
+{{$skip := 0}}
+ 
+{{$db := dbTopEntries $dbXP $eachCallAmount $skip}}
+ 
+{{$t := ""}}
+ 
+{{range $k, $v := $db}}
+{{$thispt := (toInt64 $v.Value)}}
+{{if ne $lastpt $thispt}}
+	{{$lastpt = $thispt}}
+	{{$place = add $place 1}}
+{{end}}
+{{$t = (joinStr "" $t "`#" ($place) "` - " $v.User.String " *`" (toString $thispt) " Upgrades`*\n\n")}}
+{{$embed := cembed
+	"title" "TOP 10 User's Upgrades\n\n★・・・・・・・★・・・・・・・・★"
+	"description" (joinStr "" $t "★・・・・・・・★・・・・・・・・★")
+	"color" $color
+	"footer" (sdict "text" "Servidor do Lyvon™. Todos os direitos reservados." "icon_url" "https://cdn.discordapp.com/attachments/791127649849180160/826171947376705546/logo_discord000.gif")}}
+{{if eq (toInt (mod (add $k $skip 1) 25)) 0}}
+	{{deleteMessage nil (sendMessageRetID nil $embed) 10}}
+	{{$t = ""}}
+{{end}}
+	{{/* auto send because huge blocks can cause problems*/}}
+{{end}}
+ {{$embed := cembed
+	"title" "TOP 10 User's Upgrades\n\n------------------------------------------"
+	"description" (joinStr "" $t "**-----------------------------------------------**")
+	"color" $color
+	"footer" (sdict "text" "Servidor do Lyvon™. Todos os direitos reservados." "icon_url" "https://cdn.discordapp.com/attachments/791127649849180160/826171947376705546/logo_discord000.gif")}}
+{{if $t}}
+	{{deleteMessage nil (sendMessageRetID nil $embed) 10}}
+{{end}}
