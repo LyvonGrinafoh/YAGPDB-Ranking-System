@@ -1,0 +1,111 @@
+{{$register := 791041268569866340}}
+{{$color := randInt 1 16777215}}
+{{$roleid := 0}}
+{{$dbActivator := "user_current_role"}}
+{{$level_up := 0}}
+{{$userID := .User.ID}}
+{{$init := dbIncr $userID $dbActivator 0}}
+{{$dbXP := "user_LVL"}}
+{{$username := .User.String}}
+{{$operator := ""}}
+{{$comoquiser := cslice 
+(cslice 791306505743237172 0)
+(cslice 791306796941312020 150)
+(cslice 791307150311555103 300)
+(cslice 791307431845036093 700)
+(cslice 791307718979223612 1200)
+(cslice 791307889079877652 1600)
+(cslice 791308256256458752 2100)
+(cslice 791308632934842388 2700)
+(cslice 791308910975123477 3400)
+(cslice 791309036091867146 4000)
+(cslice 791310127051178006 4700)
+(cslice 813896260594696212 5000)
+(cslice 791310670825521182 5700)
+(cslice 791310871937941515 6800)
+(cslice 791311120422010910 7900)
+(cslice 791312343874404354 9000)
+(cslice 791312491619024937 10500)
+(cslice 791314337217511425 12000)
+(cslice 791314551786307635 14000)
+(cslice 791314743864459264 17000)
+(cslice 791314938429308979 20000)
+(cslice 791315113255632936 23000)
+(cslice 791315218281660466 26000)
+(cslice 791315349386821662 29000)
+(cslice 791315442337447958 32000)
+(cslice 791315799611801600 35000)
+(cslice 791315898853097482 38000)
+(cslice 791316112780427274 41000)
+(cslice 791316239812263947 44000)
+(cslice 791316357580062751 47000)
+(cslice 791316500048510977 50000)
+(cslice 791316675022422067 53000)
+(cslice 791316822447882240 56000)
+(cslice 791317083366490112 59000)
+(cslice 791317217236353029 62000)
+(cslice 791317385700442134 65000)
+(cslice 791317511903117339 68000)
+(cslice 791317632765919242 71000)
+(cslice 791318984011153419 74000)
+(cslice 791319127347822603 77000)
+(cslice 791319295707578378 80000)
+(cslice 791319391840632832 84000)
+(cslice 791319581221453834 88000)
+(cslice 791319993249693707 92000)
+(cslice 791320063952945153 96000)
+(cslice 791320193099104296 100000)
+(cslice 791321054945214484 104000)
+(cslice 791321213510615060 108000)
+(cslice 791321297442963466 112000)
+(cslice 791321607770734602 116000)
+(cslice 791321725736321025 120000)
+(cslice 791321820103311362 125000)
+(cslice 791322213479481394 130000)
+(cslice 791322613477670922 135000)
+(cslice 801948316837216308 140000)
+(cslice 791322730473455666 145000)
+(cslice 791322882910322738 150000)
+(cslice 791322960131784735 160000)
+(cslice 791323038079385630 170000)
+}}
+{{if eq (randInt 0 5) 1}}
+	{{$upgrades := randInt -25 75}}
+	{{if gt ($upgrades) 0}}
+		{{$operator = "+"}}
+		{{addReactions ":small_red_triangle:"}}
+	{{else}}
+		{{addReactions ":small_red_triangle_down:"}}
+	{{end}}
+	{{$randomval := dbIncr $userID $dbXP $upgrades}}
+	{{$embed := cembed 
+		"title" (joinStr "" $username) 
+		"description" (joinStr "" "```" $operator $upgrades " upgrades```") 
+		"color" $color 
+		"thumbnail" (sdict "url" (.User.AvatarURL "256"))
+		"footer" (sdict "text" "Servidor do Lyvon™. Todos os direitos reservados." "icon_url" "https://cdn.discordapp.com/attachments/791127649849180160/826171947376705546/logo_discord000.gif")
+	}}
+	{{sendMessage $register $embed}}
+	{{$valxp := toInt64 ((dbGet $userID $dbXP).Value)}}
+	{{$valactivator := toInt64 ((dbGet $userID $dbActivator).Value)}}
+	{{range $k, $banana := $comoquiser}}
+		{{if and (gt ($valxp) (index $banana 1)) (eq ($valactivator) $k)}}
+			{{giveRoleID $userID (index $banana 0)}}
+			{{$roleid = (index $banana 0)}}
+			{{$init = dbIncr $userID $dbActivator 1}}
+			{{$level_up = 1}}
+		{{end}}
+	{{end}}
+	{{if (eq ($level_up) 1)}}
+		{{$embed := cembed 
+			"title" (joinStr "" "LEVEL UP!") 
+			"description" (joinStr "" "` Parabéns! Agora `" .User.Mention "` é uma `" (mentionRoleID $roleid) "`!`")
+			"color" $color
+			"thumbnail" (sdict "url" (.User.AvatarURL "256"))
+			"footer" (sdict "text" "Servidor do Lyvon™. Todos os direitos reservados." "icon_url" "https://cdn.discordapp.com/attachments/791127649849180160/826171947376705546/logo_discord000.gif")
+		}}
+		{{sendMessage 791037610549706793 (joinStr "" .User.Mention " teve uma atualização nos cargos de rank.")}}
+		{{deleteMessage nil (sendMessageRetID nil $embed) 10}}
+		{{(sendMessage $register $embed)}}
+	{{end}}
+{{end}}
