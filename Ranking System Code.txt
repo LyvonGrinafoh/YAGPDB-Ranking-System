@@ -1,3 +1,4 @@
+{{/* Reccomended Trigger:(Regex) .* */}}
 {{$register := 791041268569866340}}
 {{$color := randInt 1 16777215}}
 {{$roleid := 0}}
